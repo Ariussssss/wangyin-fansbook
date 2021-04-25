@@ -10,7 +10,7 @@ if __name__ == "__main__":
     book.set_identifier("sample123456")
     book.set_title("Wangyin Blog")
     book.set_language("zh")
-
+    book.set_cover("cover.png", open('./cover.png', 'rb').read())
     book.add_author("Wangyin")
     base = "https://www.yinwang.org/"
     total = BeautifulSoup(requests.get(base).text, "html.parser")
@@ -23,9 +23,7 @@ if __name__ == "__main__":
         file_name = f"./cache/{a_el.text}.html"
         if os.path.isfile(file_name):
             print(a_el["href"], a_el.text, "caching")
-            fs = open(file_name, "r")
-            res = fs.read()
-            fs.close()
+            res = open(file_name, "r").read()
         else:
             print(a_el["href"], a_el.text, "fetching")
             res = requests.get(base + a_el["href"]).text
@@ -39,12 +37,24 @@ if __name__ == "__main__":
         chapter = epub.EpubHtml(
             title=a_el.text, file_name=f"{a_el.text}.xhtml", lang="zh"
         )
+        images = article_html.find_all("img")
+        if images and len(images) > 0:
+            for i in images:
+                link = i.get('src')
+                image_path = f'./cache/images/{os.path.basename(link)}'
+                if not os.path.isfile(image_path):
+                    with open(image_path, "wb") as f:
+                        try:
+                            f.write(requests.get(link).content)
+                        except:
+                            f.write(b'')
+                i.src = image_path
         chapter.content = "".join(
             list(
                 map(
                     lambda a: str(a),
                     filter(
-                        lambda a: (a and a.find("img") == None),
+                        lambda a: a,
                         body.contents,
                     ),
                 )

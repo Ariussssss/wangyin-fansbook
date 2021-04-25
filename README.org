@@ -1,0 +1,3 @@
+#+STARTUP: content
+* Wangyin fansbook
+  Nothing just a book created from wangyin blog.
