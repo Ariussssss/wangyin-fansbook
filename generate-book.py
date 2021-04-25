@@ -27,9 +27,7 @@ if __name__ == "__main__":
         else:
             print(a_el["href"], a_el.text, "fetching")
             res = requests.get(base + a_el["href"]).text
-            wfs = open(file_name, "w")
-            wfs.write(res)
-            wfs.close()
+            open(file_name, "w").write(res)
         article_html = BeautifulSoup(res, "html.parser")
         body = article_html.find("div", class_="inner")
         if not body or "c-sharp-disposable" in a_el["href"]:
@@ -53,10 +51,7 @@ if __name__ == "__main__":
             list(
                 map(
                     lambda a: str(a),
-                    filter(
-                        lambda a: a,
-                        body.contents,
-                    ),
+                    body.contents,
                 )
             )
         )
