@@ -3,6 +3,7 @@
 from ebooklib import epub
 import requests
 import os
+import base64
 from bs4 import BeautifulSoup
 
 if __name__ == "__main__":
@@ -20,6 +21,7 @@ if __name__ == "__main__":
 
     for a in l:
         a_el = a.find("a")
+        date_el = a.find("div", class_="date")
         file_name = f"./cache/{a_el.text}.html"
         if os.path.isfile(file_name):
             print(a_el["href"], a_el.text, "caching")
@@ -46,8 +48,13 @@ if __name__ == "__main__":
                             f.write(requests.get(link).content)
                         except:
                             f.write(b'')
-                i.src = image_path
-        chapter.content = "".join(
+                with open(image_path, "rb") as f:
+                    t = f.read() 
+                    if t:
+                        i['src'] = f'data:image/png;base64,{str(base64.b64encode(t).decode())}'
+                    else:
+                        i['src'] = ''
+        chapter.content = str(date_el) + "".join(
             list(
                 map(
                     lambda a: str(a),
